@@ -1,0 +1,463 @@
+openapi: 3.0.3
+info:
+  title: Task Manager API
+  description: A complete CRUD API for managing tasks with user authentication
+  version: 1.0.0
+servers:
+- url: http://localhost:8000
+  description: Local development server
+- url: https://cloudy-florette-daryldev-d47f8fdb.koyeb.app/
+  description: Production server 
+paths:
+  /:
+    get:
+      summary: Root
+      description: Root endpoint
+      operationId: root__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /auth/signup:
+    post:
+      summary: Signup
+      description: Register a new user and return access token
+      operationId: signup_auth_signup_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+        required: true
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /auth/login:
+    post:
+      summary: Login
+      description: Login and get access token
+      operationId: login_auth_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLogin'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tasks/:
+    post:
+      summary: Create Task
+      description: Create a new task for the authenticated user
+      operationId: create_task_tasks__post
+      security:
+      - OAuth2PasswordBearer: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreate'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      summary: Get Tasks
+      description: Get all tasks for the authenticated user, optionally filtered by
+        completion status
+      operationId: get_tasks_tasks__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: completed
+        in: query
+        required: false
+        schema:
+          type: boolean
+          title: Completed
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TaskResponse'
+                title: Response Get Tasks Tasks  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tasks/{task_id}:
+    get:
+      summary: Get Task
+      description: Get a specific task by ID
+      operationId: get_task_tasks__task_id__get
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Task Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    put:
+      summary: Update Task
+      description: Update a specific task
+      operationId: update_task_tasks__task_id__put
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Task Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      summary: Delete Task
+      description: Delete a specific task
+      operationId: delete_task_tasks__task_id__delete
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Task Id
+      responses:
+        '204':
+          description: Successful Response
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /tasks/{task_id}/attachment:
+    patch:
+      summary: Update Task Attachment
+      description: Update the attachment URL for a specific task
+      operationId: update_task_attachment_tasks__task_id__attachment_patch
+      security:
+      - OAuth2PasswordBearer: []
+      parameters:
+      - name: task_id
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Task Id
+      - name: attachment_url
+        in: query
+        required: true
+        schema:
+          type: string
+          title: Attachment Url
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /health:
+    get:
+      summary: Health Check
+      description: Health check endpoint
+      operationId: health_check_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+components:
+  schemas:
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    TaskCreate:
+      properties:
+        title:
+          type: string
+          maxLength: 200
+          minLength: 1
+          title: Title
+        description:
+          title: Description
+          type: string
+          maxLength: 1000
+          nullable: true
+        due_date:
+          title: Due Date
+          type: string
+          format: date-time
+          nullable: true
+        completed:
+          type: boolean
+          title: Completed
+          default: false
+      type: object
+      required:
+      - title
+      title: TaskCreate
+      description: Schema for creating a task
+    TaskResponse:
+      properties:
+        id:
+          type: integer
+          title: Id
+        title:
+          type: string
+          title: Title
+        description:
+          title: Description
+          type: string
+          nullable: true
+        due_date:
+          title: Due Date
+          type: string
+          format: date-time
+          nullable: true
+        completed:
+          type: boolean
+          title: Completed
+        attachment_url:
+          title: Attachment Url
+          type: string
+          nullable: true
+        user_id:
+          type: integer
+          title: User Id
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+        updated_at:
+          type: string
+          format: date-time
+          title: Updated At
+      type: object
+      required:
+      - id
+      - title
+      - description
+      - due_date
+      - completed
+      - attachment_url
+      - user_id
+      - created_at
+      - updated_at
+      title: TaskResponse
+      description: Schema for task response
+    TaskUpdate:
+      properties:
+        title:
+          title: Title
+          type: string
+          maxLength: 200
+          minLength: 1
+          nullable: true
+        description:
+          title: Description
+          type: string
+          maxLength: 1000
+          nullable: true
+        due_date:
+          title: Due Date
+          type: string
+          format: date-time
+          nullable: true
+        completed:
+          title: Completed
+          type: boolean
+          nullable: true
+      type: object
+      title: TaskUpdate
+      description: Schema for updating a task
+    Token:
+      properties:
+        access_token:
+          type: string
+          title: Access Token
+        token_type:
+          type: string
+          title: Token Type
+      type: object
+      required:
+      - access_token
+      - token_type
+      title: Token
+      description: Schema for authentication token
+    UserCreate:
+      properties:
+        username:
+          type: string
+          maxLength: 50
+          minLength: 3
+          title: Username
+        email:
+          type: string
+          maxLength: 100
+          title: Email
+        password:
+          type: string
+          maxLength: 100
+          minLength: 6
+          title: Password
+      type: object
+      required:
+      - username
+      - email
+      - password
+      title: UserCreate
+      description: Schema for user registration
+    UserLogin:
+      properties:
+        username:
+          type: string
+          title: Username
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+      - username
+      - password
+      title: UserLogin
+      description: Schema for user login
+    UserResponse:
+      properties:
+        id:
+          type: integer
+          title: Id
+        username:
+          type: string
+          title: Username
+        email:
+          type: string
+          title: Email
+        created_at:
+          type: string
+          format: date-time
+          title: Created At
+      type: object
+      required:
+      - id
+      - username
+      - email
+      - created_at
+      title: UserResponse
+      description: Schema for user response (without password)
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+  securitySchemes:
+    OAuth2PasswordBearer:
+      type: oauth2
+      flows:
+        password:
+          scopes: {}
+          tokenUrl: /auth/login

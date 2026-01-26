@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Targetsum",
-    "slug": "Targetsum",
+    "name": "Task_manager",
+    "slug": "Task_manager",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.daryldewilde.Task_manager"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +22,8 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.daryldewilde.Task_manager"
     },
     "web": {
       "favicon": "./assets/favicon.png"
