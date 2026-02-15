@@ -1,25 +1,14 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { AuthScreen, TaskListScreen, AddTaskScreen } from "../screens";
-import { getData } from "../../utils/utils";
-import { useState, useEffect } from "react";
+import { useAuth } from "../../context/AuthContext";
 
 const Stack = createNativeStackNavigator();
 
 function MainStack() {
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const checkToken = async () => {
-      const storedToken = await getData('token');
-      setToken(storedToken);
-      setIsLoading(false);
-    };
-    checkToken();
-  }, []);
+  const { token, isLoading } = useAuth();
 
   if (isLoading) {
-    return null; 
+    return null;
   }
 
   return (

@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
      tabHeaders: {
         flexDirection: 'row',
         backgroundColor: '#4a7bc2',
-        borderRadius: 8,
+        borderRadius: 15,
         marginVertical: 24,
         marginHorizontal:20,
         overflow: 'hidden',

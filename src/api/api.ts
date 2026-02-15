@@ -1,7 +1,14 @@
 import axios from "axios";
 import { API_BASE_URL } from "@env";
 import { loginCreds, singnUpCreds } from "../types/types";
-import { getData, removeData } from "../utils/utils";
+import { getData } from "../utils/utils";
+
+// This will be set by AuthContext
+let logoutCallback: (() => void) | null = null;
+
+export const setLogoutCallback = (callback: () => void) => {
+  logoutCallback = callback;
+};
 
 // Create axios instance with base configuration
 const apiClient = axios.create({
@@ -16,9 +23,10 @@ apiClient.interceptors.response.use(
     (response) => response,
     async (error) => {
         if (error.response && error.response.status === 401) {
-            console.log("401 Unauthorized - Clearing token");
-            await removeData('token');
-            // Token removal will trigger MainStack to re-render and show auth screen
+            console.log("401 Unauthorized - Logging out");
+            if (logoutCallback) {
+                logoutCallback();
+            }
         }
         return Promise.reject(error);
     }

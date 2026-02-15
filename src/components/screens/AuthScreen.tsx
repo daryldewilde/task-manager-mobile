@@ -5,25 +5,21 @@ import { AuthTabType, loginCreds, singnUpCreds, successAuthdata } from "../../ty
 import { useMutation } from "@tanstack/react-query";
 import  {loginUser, signUpUser} from "../../api/api";
 import {useForm, Controller} from "react-hook-form";
-import { getData, storeData } from "../../utils/utils";
-import { useNavigation } from "@react-navigation/native";
+import { useAuth } from "../../context/AuthContext";
 
 
 const AuthTabs = () => {
     const {control, handleSubmit} = useForm();
     const DEFAULT_ACTIVE_TAB: AuthTabType = AuthTabType.Login;
     const [activeTab, setActiveTab] = useState<AuthTabType>(DEFAULT_ACTIVE_TAB);
-    const navigation = useNavigation();
+    const { login } = useAuth();
 
     const loginMutation = useMutation({
         mutationFn: (data: loginCreds) => 
             loginUser(data),
         onSuccess: async (data:successAuthdata) => {
-            await storeData("token", data.access_token)
-            const token = await getData("token");
-            console.log("Retrieved token:", token);
+            await login(data.access_token);
             console.log('Login successful:', data);
-            navigation.navigate("Task List");
         },
         onError: (error) => {
             console.error('Login failed:', error);
@@ -35,10 +31,9 @@ const AuthTabs = () => {
             console.log(data)
             return signUpUser(data)
         },
-        onSuccess: (data:successAuthdata) => {
-            storeData("token", data.access_token)
+        onSuccess: async (data:successAuthdata) => {
+            await login(data.access_token);
             console.log('Signup successful:', data);
-            navigation.navigate("Task List");
         },
         onError: (error: any) => {
             console.error('Signup failed:', error);
