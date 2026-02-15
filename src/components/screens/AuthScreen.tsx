@@ -1,41 +1,44 @@
 import { Text, View, StyleSheet, TouchableOpacity, TextInput} from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { useState } from "react";
-import { AuthTabType } from "../../types/types";
+import { AuthTabType, loginCreds, singnUpCreds, successAuthdata } from "../../types/types";
 import { useMutation } from "@tanstack/react-query";
 import  {loginUser, signUpUser} from "../../api/api";
 import {useForm, Controller} from "react-hook-form";
-
-
+import { getData, storeData } from "../../utils/utils";
+import { useNavigation } from "@react-navigation/native";
 
 
 const AuthTabs = () => {
     const {control, handleSubmit} = useForm();
     const DEFAULT_ACTIVE_TAB: AuthTabType = AuthTabType.Login;
     const [activeTab, setActiveTab] = useState<AuthTabType>(DEFAULT_ACTIVE_TAB);
+    const navigation = useNavigation();
 
-    // Set up mutations for API calls
     const loginMutation = useMutation({
-        mutationFn: (data: { email: string; password: string }) => 
-            loginUser(data.email, data.password),
-        onSuccess: (data) => {
+        mutationFn: (data: loginCreds) => 
+            loginUser(data),
+        onSuccess: async (data:successAuthdata) => {
+            await storeData("token", data.access_token)
+            const token = await getData("token");
+            console.log("Retrieved token:", token);
             console.log('Login successful:', data);
-            // TODO: Navigate to home screen or store token
+            navigation.navigate("Task List");
         },
         onError: (error) => {
             console.error('Login failed:', error);
-            // TODO: Show error message to user
         }
     });
 
     const signupMutation = useMutation({
-        mutationFn: (data: { username: string; email: string; password: string }) => {
+        mutationFn: (data: singnUpCreds) => {
             console.log(data)
-            return signUpUser(data.username, data.email, data.password)
+            return signUpUser(data)
         },
-        onSuccess: (data) => {
+        onSuccess: (data:successAuthdata) => {
+            storeData("token", data.access_token)
             console.log('Signup successful:', data);
-            // TODO: Navigate to home screen or store token
+            navigation.navigate("Task List");
         },
         onError: (error: any) => {
             console.error('Signup failed:', error);
@@ -77,17 +80,16 @@ const AuthTabs = () => {
                     <View style={styles.formContainer}>
                         <Controller
                             control={control}
-                            name="email"
-                            rules={{ required: 'Email is required' }}
+                            name="username"
+                            rules={{ required: 'Username is required' }}
                             render={({ field: { onChange, onBlur, value } }) => (
                                 <TextInput 
-                                    placeholder="Email" 
+                                    placeholder="username" 
                                     style={styles.input}
                                     placeholderTextColor="#999"
                                     onBlur={onBlur}
                                     onChangeText={onChange}
                                     value={value}
-                                    keyboardType="email-address"
                                     autoCapitalize="none"
                                 />
                             )}
