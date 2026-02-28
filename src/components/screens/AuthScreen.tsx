@@ -46,12 +46,12 @@ const AuthTabs = () => {
     // Handle form submissions
     const handleLogin = handleSubmit((data) => {
         console.log('LOGIN - Form data being sent:', data);
-        loginMutation.mutate(data as { email: string; password: string });
+        loginMutation.mutate(data as loginCreds);
     });
 
     const handleSignup = handleSubmit((data) => {
         console.log('SIGNUP - Form data being sent:', data);
-        signupMutation.mutate(data as { username: string; email: string; password: string });
+        signupMutation.mutate(data as singnUpCreds);
     });
 
     return (

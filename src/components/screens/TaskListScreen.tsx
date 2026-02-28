@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAllTasks } from "../../api/api";
 import Spinner from "react-native-loading-spinner-overlay";
+import { useNavigation } from "@react-navigation/native";
 
 enum taskListTabs {
   AllTasks="All Tasks",
@@ -18,6 +19,8 @@ function TaskListScreen() {
     queryKey:["ALL TASKS"],
     queryFn: fetchAllTasks
   })
+
+  const navigation = useNavigation();
 
    const TaskComponent = ({task}:{task:any}) => {
     return (
@@ -57,7 +60,7 @@ function TaskListScreen() {
         <StatusBar style="auto" />
         <TouchableOpacity 
           style={styles.addButton}
-          onPress={() => console.log("Navigate to Add Task Screen")}
+          onPress={() => navigation.navigate("Add Task")}
         >
           <Text style={styles.addButtonText}>+ Add Task</Text>  
         </TouchableOpacity>

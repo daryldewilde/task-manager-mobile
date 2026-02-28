@@ -19,4 +19,12 @@ interface successAuthdata {
   token_type: string
 }
 
-export {AuthTabType, loginCreds, singnUpCreds, successAuthdata}
+interface task {
+  title: string,
+  description: string,
+  due_date: Date,
+  completed: Boolean
+}
+
+export {AuthTabType
+  , loginCreds, singnUpCreds, successAuthdata,task}

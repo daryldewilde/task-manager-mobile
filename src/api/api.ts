@@ -1,6 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL } from "@env";
-import { loginCreds, singnUpCreds } from "../types/types";
+import { loginCreds, singnUpCreds, task } from "../types/types";
 import { getData } from "../utils/utils";
 
 // This will be set by AuthContext
@@ -84,4 +84,17 @@ const fetchAllTasks = async () => {
     }
 }
 
-export { signUpUser, loginUser, fetchAllTasks };
+const AddTasks = async (data:task) =>{
+    try{
+         const response = await apiClient.post("/tasks")
+    }catch(error){
+        if(axios.isAxiosError(error) && error.response){
+            console.error("Error adding task:", error.response.data);
+        }else{
+            console.error("Error adding task:", error);
+        }
+        throw error;
+    }
+}
+
+export { signUpUser, loginUser, fetchAllTasks, AddTasks };
