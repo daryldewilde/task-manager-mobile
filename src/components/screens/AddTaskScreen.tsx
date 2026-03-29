@@ -6,11 +6,13 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { useMutation } from "@tanstack/react-query";  
 import { AddTasks } from "../../api/api";
 import { task } from "../../types/types";
+import { useQueryClient } from "@tanstack/react-query"; 
 
 
 const AddTaskScreen = () => {
- const {control, handleSubmit} = useForm()
- const [showDatePicker, setShowDatePicker] = useState(false);
+    const {control, handleSubmit} = useForm()
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const queryClient = useQueryClient();
     const {mutate: addTask, isPending} = useMutation({
         mutationFn: async (data:task) => {
             return await AddTasks(data)
@@ -20,9 +22,9 @@ const AddTaskScreen = () => {
         },
         onSuccess: (data) => {
             console.log("Task added successfully:", data);
+            queryClient.invalidateQueries({queryKey: ["ALL TASKS"]})
         }
-    }
-    )
+    })
     const handleAddTask = handleSubmit((data)=> {
         addTask(data as task)
     })
@@ -30,7 +32,7 @@ const AddTaskScreen = () => {
         <View style={styles.container}>
             <View style={styles.formContent}>
                 <Controller
-                name="Title"
+                name="title"
                 control={control}
                 rules={{required:true}}
                 render={({field}) => (
@@ -44,7 +46,7 @@ const AddTaskScreen = () => {
             />
 
             <Controller
-                name="Description"
+                name="description"
                 control={control}
                 rules={{required:true}}
                 render={({field}) => (
@@ -92,7 +94,7 @@ const AddTaskScreen = () => {
             />
 
             <Controller
-                name="Completed"
+                name="completed"
                 control={control}
                 defaultValue={false}
                 render={({field: { value }}) => (

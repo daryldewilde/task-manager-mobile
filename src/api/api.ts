@@ -18,6 +18,15 @@ const apiClient = axios.create({
     },
 });
 
+// Attach token to requests when available.
+apiClient.interceptors.request.use(async (config) => {
+    const token = await getData('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
 // Add response interceptor to handle 401 errors globally
 apiClient.interceptors.response.use(
     (response) => response,
@@ -58,18 +67,7 @@ const loginUser = async (data:loginCreds) => {
 
 const fetchAllTasks = async () => {
     try {
-        const token = await getData('token');
-        console.log("Token retrieved for fetching tasks:", token);
-        
-        if (!token) {
-            throw new Error('No authentication token found');
-        }
-        
-        const response = await apiClient.get('/tasks/', {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const response = await apiClient.get('/tasks/');
         
         console.log("Tasks fetched successfully:", response.data);
         return response.data;
@@ -86,7 +84,8 @@ const fetchAllTasks = async () => {
 
 const AddTasks = async (data:task) =>{
     try{
-         const response = await apiClient.post("/tasks")
+         const response = await apiClient.post('/tasks/', data);
+         return response.data;
     }catch(error){
         if(axios.isAxiosError(error) && error.response){
             console.error("Error adding task:", error.response.data);

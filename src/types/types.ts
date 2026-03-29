@@ -22,8 +22,8 @@ interface successAuthdata {
 interface task {
   title: string,
   description: string,
-  due_date: Date,
-  completed: Boolean
+  due_date: string,
+  completed: boolean
 }
 
 export {AuthTabType

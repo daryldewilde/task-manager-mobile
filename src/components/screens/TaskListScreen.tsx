@@ -24,10 +24,12 @@ function TaskListScreen() {
 
    const TaskComponent = ({task}:{task:any}) => {
     return (
-      <View style={{padding:12, borderBottomWidth:1, borderBottomColor:"#cfd4dced", width:"100%"}}>
-        <Text style={{fontSize:16, fontWeight:"500"}}>{task.title}</Text>
-        <Text style={{color:"grey"}}>{task.description}</Text>
-      </View>
+      <TouchableOpacity style={styles.taskItem}
+       onPress={() => navigation.navigate("Task Details", {taskId: task.id})} 
+      >
+        <Text style={styles.taskItemTitle}>{task.title}</Text>
+        <Text style={styles.taskItemDescription}>{task.description}</Text>
+      </TouchableOpacity>
     )
   }
   return (
@@ -120,6 +122,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
+  taskItem: {
+    padding:12, 
+    borderWidth:1, 
+    borderColor:"#cfd4dced", 
+    borderRadius:10, width:"90%", 
+    marginHorizontal:80, 
+    marginVertical:8, 
+    elevation:2, 
+    backgroundColor:"white"
+  },
+  taskItemTitle: {
+    fontSize:16, 
+    fontWeight:"500"
+  },
+  taskItemDescription: {
+    color:"grey"
+  }
 });
 
 export default TaskListScreen;

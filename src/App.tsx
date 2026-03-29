@@ -1,5 +1,4 @@
-import MainStack from './components/navigation/MainStack';
-import { NavigationContainer } from '@react-navigation/native';
+import Navigation from './components/navigation/Navigation';
 import  { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
 
@@ -9,9 +8,7 @@ export default function App() {
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
-        <NavigationContainer>
-          <MainStack />
-        </NavigationContainer>
+        <Navigation />
       </QueryClientProvider>
     </AuthProvider>
   );
